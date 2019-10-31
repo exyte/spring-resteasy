@@ -39,7 +39,7 @@ curl -X POST -H "Content-Type: text/plain" -d @getstring http://localhost:8080/s
 
 # Implementation details
 
-All source code located in the [src/](src/) folder. README.html contains information how to rebuild application war.
+All source code located in the [src/](src/) folder.
 
 Following quickstart example is used as an initial project: 
 https://github.com/wildfly/quickstart/tree/17.0.1.Final/spring-resteasy
