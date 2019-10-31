@@ -1,0 +1,1 @@
+<PROGRAM name="holidays"><ENTRY name="putholiday"><PARAM name="hol-linkage"><hol-linkage><hol-rec><hol-id>0</hol-id><hol-name>Christmas</hol-name><hol-dt><hol-wkday>char*</hol-wkday><hol-mon>char*</hol-mon><hol-day>int</hol-day><hol-yr>int</hol-yr></hol-dt><hol-cur-dt>char*</hol-cur-dt></hol-rec><hol-io-msg>char*</hol-io-msg></hol-linkage></PARAM></ENTRY></PROGRAM>
