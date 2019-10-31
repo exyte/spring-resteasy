@@ -34,12 +34,12 @@ cobcrun xholidays
 ## 4. Make POST requests
 Use cURL to make a POST request to http://localhost:8080/spring-resteasy/xprogram:
 ```
-curl -X POST -H "Content-Type: text/plain" -d @getstring http://localhost:8081/spring-resteasy/xprogram
+curl -X POST -H "Content-Type: text/plain" -d @getstring http://localhost:8080/spring-resteasy/xprogram
 ```
 
 # Implementation details
 
-All source codes are located in spring-resteasy.zip, README.html contains information how to rebuild application war.
+All source code located in the [src/](src/) folder. README.html contains information how to rebuild application war.
 
 Following quickstart example is used as initial project: 
 https://github.com/wildfly/quickstart/tree/17.0.1.Final/spring-resteasy
