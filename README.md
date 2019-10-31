@@ -82,4 +82,12 @@ public Response postXProgramForm(@FormParam("msg") String msg) {
 <bean id="xProgramSpringResource" class="org.jboss.as.quickstarts.resteasyspring.XProgramSpringResource" />
 ```
 
+## How to build?
+
+[Apache Maven](https://maven.apache.org/) is required to build the project with using following command:
+```
+mvn clean package
+```
+Result __spring-resteasy.war__ web application will be available in __target__ folder.
+
 
