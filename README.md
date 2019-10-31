@@ -4,7 +4,7 @@
 Use following instruction to install and configure Wildfly (JBoss) 17.0.1.Final on Ubuntu 18.04 LTS: https://vitux.com/install-and-configure-wildfly-jboss-on-ubuntu/
 
 ## 2. Deploy spring-resteasy.war to the server
-Following instructions contains information how to deploy applications on WildFly using the Web Console and the CLI: http://www.mastertheboss.com/jboss-server/jboss-deploy/deploying-applications-on-wildfly-using-the-web-console-and-the-cli
+Following instructions contains information how to deploy (spring-resteasy.war)[spring-resteasy.war] application on WildFly using the Web Console or the CLI: http://www.mastertheboss.com/jboss-server/jboss-deploy/deploying-applications-on-wildfly-using-the-web-console-and-the-cli
 
 ## 3. Configure program to execute
 Copy _holidays.cbl_ and _xholidays.cbl_ into __/vagrant/cobol/webservices/xholidays__ folder on the server and compile them:
