@@ -41,139 +41,45 @@ curl -X POST -H "Content-Type: text/plain" -d @getstring http://localhost:8080/s
 
 All source code located in the [src/](src/) folder. README.html contains information how to rebuild application war.
 
-Following quickstart example is used as initial project: 
+Following quickstart example is used as an initial project: 
 https://github.com/wildfly/quickstart/tree/17.0.1.Final/spring-resteasy
 
-
-Added XProgram bean, the bean is initialized with a program execution working directory and with path to a program to execute. The process method of the bean accepts a string as argument, executes configured command line program and returns program execution output:
-__src/main/java/org/jboss/as/quickstarts/resteasyspring/XProgramBean.java__
+There are 3 key files:
+* [XProgramBean](src/main/java/org/jboss/as/quickstarts/resteasyspring/XProgramBean.java) executes configured command line program in the specified working directory and returns program execution output.
+* [XProgramSpringResource](src/main/java/org/jboss/as/quickstarts/resteasyspring/XProgramSpringResource.java) process POST requests to the XProgram bean:
 ```java
-package org.jboss.as.quickstarts.resteasyspring;
+@Autowired
+XProgramBean xProgramBean;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.function.Consumer;
-
-public class XProgramBean {
-
-    private String workDirPath;
-    private String programToRun;
-    private boolean isWindows;
-
-    public XProgramBean(String workDirPath, String programToRun) {
-        this.workDirPath = workDirPath;
-        this.programToRun = programToRun;
-        this.isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-    }
-
-    public String process(String request) {
-        StringBuilder result = new StringBuilder();
-        try {
-            ProcessBuilder builder = new ProcessBuilder();
-            if (isWindows) {
-                builder.command("cmd.exe", "/c", programToRun);
-            } else {
-                builder.command("sh", "-c", programToRun);
-            }
-            builder.directory(new File(workDirPath));
-
-            System.out.println("Work directory: " + workDirPath);
-            System.out.println("Command: " + String.join(" ", builder.command()));
-
-            Process process = builder.start();
-            PrintWriter pw = new PrintWriter(process.getOutputStream());
-            pw.write(request);
-            pw.write("\n");
-            pw.flush();
-
-            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), str -> {
-                System.out.println(str);
-                result.append(str).append("\n");
-            });
-            streamGobbler.run();
-
-            int exitCode = process.waitFor();
-            System.out.println("Exit code: " + exitCode);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result.toString();
-    }
-
-    private static class StreamGobbler {
-        private InputStream inputStream;
-        private Consumer<String> consumer;
-
-        public StreamGobbler(InputStream inputStream, Consumer<String> consumer) {
-            this.inputStream = inputStream;
-            this.consumer = consumer;
-        }
-
-        public void run() {
-            new BufferedReader(new InputStreamReader(inputStream)).lines().forEach(consumer);
-        }
-    }
+@POST
+@Path("xprogram")
+@Consumes("text/plain")
+@Produces("text/plain")
+public Response postXProgram(String body) {
+    String result = xProgramBean.process(body);
+    return Response.ok(result).build();
 }
 
-```
-
-Added ability to make POST requests to the XProgram bean:
-__src/main/java/org/jboss/as/quickstarts/resteasyspring/XProgramSpringResource.java__
-```java
-package org.jboss.as.quickstarts.resteasyspring;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-@Path("/")
-public class XProgramSpringResource {
-
-    @Autowired
-    XProgramBean xProgramBean;
-
-    @POST
-    @Path("xprogram")
-    @Consumes("text/plain")
-    @Produces("text/plain")
-    public Response postXProgram(String body) {
-        String result = xProgramBean.process(body);
-        return Response.ok(result).build();
-    }
-
-    @POST
-    @Path("/xprogram-form")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postXProgramForm(@FormParam("msg") String msg) {
-        String result = xProgramBean.process(msg);
-        return Response.ok(result).build();
-    }
+@POST
+@Path("/xprogram-form")
+@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+public Response postXProgramForm(@FormParam("msg") String msg) {
+    String result = xProgramBean.process(msg);
+    return Response.ok(result).build();
 }
-
 ```
-
-New beans added to application context: 
-__src/main/webapp/WEB-INF/applicationContext.xml__
+* [applicationContext.xml](src/main/webapp/WEB-INF/applicationContext.xml) where you can configure path to the executable script
 ```xml
-    <!-- XProgram bean -->
-    <bean id="xProgramBean" class="org.jboss.as.quickstarts.resteasyspring.XProgramBean">
-        <!-- Program execution working directory -->
-        <constructor-arg index="0" type="java.lang.String" value="/vagrant/cobol/webservices/xholidays" />
-        <!-- Program to execute -->
-        <constructor-arg index="1" type="java.lang.String" value="/vagrant/cobol/webservices/xholidays/run.sh" />
-    </bean>
-    
-    <!-- JAX-RS XProgram resource -->
-    <bean id="xProgramSpringResource" class="org.jboss.as.quickstarts.resteasyspring.XProgramSpringResource" />
+<!-- XProgram bean -->
+<bean id="xProgramBean" class="org.jboss.as.quickstarts.resteasyspring.XProgramBean">
+    <!-- Program execution working directory -->
+    <constructor-arg index="0" type="java.lang.String" value="/vagrant/cobol/webservices/xholidays" />
+    <!-- Program to execute -->
+    <constructor-arg index="1" type="java.lang.String" value="/vagrant/cobol/webservices/xholidays/run.sh" />
+</bean>
+
+<!-- JAX-RS XProgram resource -->
+<bean id="xProgramSpringResource" class="org.jboss.as.quickstarts.resteasyspring.XProgramSpringResource" />
 ```
 
 
