@@ -7,11 +7,25 @@ Use following instruction to install and configure Wildfly (JBoss) 17.0.1.Final 
 Following instructions contains information how to deploy [spring-resteasy.war](spring-resteasy.war) application on WildFly using the Web Console or the CLI: http://www.mastertheboss.com/jboss-server/jboss-deploy/deploying-applications-on-wildfly-using-the-web-console-and-the-cli
 
 ## 3. Configure program to execute
-Copy _holidays.cbl_ and _xholidays.cbl_ into __/vagrant/cobol/webservices/xholidays__ folder on the server and compile them:
+Copy _holidays.cbl_ and _xholidays.cbl_ into __/vagrant/cobol/webservices/xholidays__ folder on the server and compile them with using following script:
 ```
-cd /vagrant/cobol/webservices/xholidays
-. /opt/cobol-it4-64/bin/cobol-it-setup.sh
-cobc -b xholidays.cbl holidays.cbl
+#/bin/bash
+echo 'starting shellscript'
+echo 'set -e'
+set -e
+echo 'run cit setup script'
+export DEFAULT_CITDIR=/opt/cobol-it4-64
+export COBOLITDIR=$DEFAULT_CITDIR
+export PATH=$COBOLITDIR/bin:${PATH}
+export LD_LIBRARY_PATH="$COBOLITDIR/lib:${LD_LIBRARY_PATH:=}"
+export DYLD_LIBRARY_PATH="$COBOLITDIR/lib:${DYLD_LIBRARY_PATH:=}"
+export SHLIB_PATH="$COBOLITDIR/lib:${SHLIB_PATH:=}"
+export LIBPATH="$COBOLITDIR/lib:${LIBPATH:=}"
+export COB="COBOL-IT"
+echo COBOL-IT Environement set to $COBOLITDIR
+echo 'building service ...'
+cobc -err errfile -g -ftraceall -x xholidays.cbl holidays.cbl 
+echo 'all done'
 ```
 
 In the __/vagrant/cobol/webservices/xholidays__ folder create __run.sh__ script with following content:
@@ -28,7 +42,7 @@ COB="COBOL-IT"
 COB_ERROR_FILE=/tmp/coberrplus
 export COB_FILE_PATH=/tmp
 export COB COBOLITDIR LD_LIBRARY_PATH PATH DYLD_LIBRARY_PATH SHLIB_PATH LIBPATH COB_ERROR_FILE
-cobcrun xholidays
+./xholidays
 ```
 
 ## 4. Make POST requests
